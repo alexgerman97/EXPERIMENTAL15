@@ -1,0 +1,12 @@
+[
+    {
+        "usuario": "admin",
+        "producto": "Hamburguesa",
+        "fecha": "27/09/2026"
+    },
+    {
+        "usuario": "alex",
+        "producto": "Pizza",
+        "fecha": "27/09/2026"
+    }
+]
