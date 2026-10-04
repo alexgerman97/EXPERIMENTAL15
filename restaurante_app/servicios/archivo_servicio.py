@@ -1,111 +1,52 @@
 import json
+from pathlib import Path
 
 
 class ArchivoServicio:
 
     def __init__(self) -> None:
+        self.base_dir = Path(__file__).resolve().parent.parent
+        self.datos_dir = self.base_dir / "datos"
 
-        self.archivo_productos = (
-            "restaurante_app/datos/productos.json"
-        )
+        self.archivo_productos = self.datos_dir / "productos.json"
+        self.archivo_usuarios = self.datos_dir / "usuarios.json"
+        self.archivo_ventas = self.datos_dir / "ventas.json"
 
-        self.archivo_usuarios = (
-            "restaurante_app/datos/usuarios.json"
-        )
+        self.datos_dir.mkdir(exist_ok=True)
 
-        self.archivo_ventas = (
-            "restaurante_app/datos/ventas.json"
-        )
-
-    def cargar_productos(self):
-
+    def _cargar(self, ruta: Path) -> list:
         try:
-
-            with open(
-                self.archivo_productos,
-                "r",
-                encoding="utf-8"
-            ) as archivo:
-
-                return json.load(archivo)
-
-        except (
-            FileNotFoundError,
-            json.JSONDecodeError
-        ):
-
+            with open(ruta, "r", encoding="utf-8") as archivo:
+                datos = json.load(archivo)
+                return datos if isinstance(datos, list) else []
+        except (FileNotFoundError, json.JSONDecodeError, PermissionError):
             return []
 
-    def cargar_usuarios(self):
-
+    def _guardar(self, ruta: Path, datos: list) -> None:
         try:
+            with open(ruta, "w", encoding="utf-8") as archivo:
+                json.dump(
+                    datos,
+                    archivo,
+                    indent=4,
+                    ensure_ascii=False
+                )
+        except PermissionError as error:
+            raise PermissionError(
+                f"No hay permisos para escribir en {ruta.name}."
+            ) from error
 
-            with open(
-                self.archivo_usuarios,
-                "r",
-                encoding="utf-8"
-            ) as archivo:
+    def cargar_productos(self) -> list:
+        return self._cargar(self.archivo_productos)
 
-                return json.load(archivo)
+    def cargar_usuarios(self) -> list:
+        return self._cargar(self.archivo_usuarios)
 
-        except (
-            FileNotFoundError,
-            json.JSONDecodeError
-        ):
+    def cargar_ventas(self) -> list:
+        return self._cargar(self.archivo_ventas)
 
-            return []
+    def guardar_productos(self, productos: list) -> None:
+        self._guardar(self.archivo_productos, productos)
 
-    def cargar_ventas(self):
-
-        try:
-
-            with open(
-                self.archivo_ventas,
-                "r",
-                encoding="utf-8"
-            ) as archivo:
-
-                return json.load(archivo)
-
-        except (
-            FileNotFoundError,
-            json.JSONDecodeError
-        ):
-
-            return []
-
-    def guardar_productos(
-        self,
-        productos
-    ):
-
-        with open(
-            self.archivo_productos,
-            "w",
-            encoding="utf-8"
-        ) as archivo:
-
-            json.dump(
-                productos,
-                archivo,
-                indent=4,
-                ensure_ascii=False
-            )
-
-    def guardar_ventas(
-        self,
-        ventas
-    ):
-
-        with open(
-            self.archivo_ventas,
-            "w",
-            encoding="utf-8"
-        ) as archivo:
-
-            json.dump(
-                ventas,
-                archivo,
-                indent=4,
-                ensure_ascii=False
-            )
+    def guardar_ventas(self, ventas: list) -> None:
+        self._guardar(self.archivo_ventas, ventas)

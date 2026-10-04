@@ -1,37 +1,32 @@
 import tkinter as tk
+from pathlib import Path
 
 from servicios.archivo_servicio import ArchivoServicio
 from servicios.restaurante_servicio import RestauranteServicio
-
 from ui.login_view import LoginView
 from ui.main_view import MainView
 
 
 def main() -> None:
-
     root = tk.Tk()
 
-    try:
-        root.iconbitmap("assets/icono.ico")
-    except Exception as e:
-        print("Error icono:", e)
+    base_dir = Path(__file__).resolve().parent
+    ruta_icono = base_dir / "assets" / "icono.ico"
 
-    root.title("Restaurante App")
-    root.geometry("900x600")
+    try:
+        root.iconbitmap(ruta_icono)
+    except tk.TclError as error:
+        print(f"No se pudo cargar el icono: {error}")
+
+    root.title("Restaurante App - Semana 15")
+    root.geometry("1000x700")
+    root.minsize(900, 650)
 
     archivo_servicio = ArchivoServicio()
 
-    productos = (
-        archivo_servicio.cargar_productos()
-    )
-
-    usuarios = (
-        archivo_servicio.cargar_usuarios()
-    )
-
-    ventas = (
-        archivo_servicio.cargar_ventas()
-    )
+    productos = archivo_servicio.cargar_productos()
+    usuarios = archivo_servicio.cargar_usuarios()
+    ventas = archivo_servicio.cargar_ventas()
 
     restaurante_servicio = RestauranteServicio(
         productos,
@@ -40,7 +35,6 @@ def main() -> None:
     )
 
     def mostrar_login() -> None:
-
         for widget in root.winfo_children():
             widget.destroy()
 
@@ -51,7 +45,6 @@ def main() -> None:
         )
 
     def mostrar_main() -> None:
-
         for widget in root.winfo_children():
             widget.destroy()
 
@@ -62,7 +55,6 @@ def main() -> None:
         )
 
     mostrar_login()
-
     root.mainloop()
 
 
